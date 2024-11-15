@@ -63,18 +63,22 @@ class _SignInScreenState extends State<SignInScreen> {
           'device_code': deviceCode ?? 'unknown', // Kirim device code
         },
       );
-
+      print('Response body: ${response.body}'); // Menampilkan respons ke konsol
       setState(() {
         _isLoading = false;
       });
 
+      // Cek kode status
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final String token = responseData['token'];
 
         // Simpan token ke SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('access_token', token);
+        await prefs.setString('access_token', token); // Pastikan kunci yang Anda gunakan sesuai
+
+        // Cetak token ke konsol
+        print('Token yang disimpan: $token'); // Cetak token di sini
 
         // Navigasi ke HomeScreen
         Navigator.pushReplacement(
@@ -82,9 +86,11 @@ class _SignInScreenState extends State<SignInScreen> {
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else {
+        // Menampilkan pesan kesalahan dari server
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        final String message =
-            responseData['message'] ?? 'Login gagal, Autentikasi salah.';
+        final String message = responseData['error'] ?? 
+          responseData['message'] ?? 
+          'Login gagal, Autentikasi salah.';
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -97,11 +103,15 @@ class _SignInScreenState extends State<SignInScreen> {
         _isLoading = false;
       });
 
+      // Tampilkan pesan kesalahan umum
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Terjadi kesalahan. Coba lagi nanti."),
         ),
       );
+
+      // Jika Anda ingin melihat kesalahan di konsol
+      print('Error: $e'); // Logging error untuk debugging
     }
   }
 }

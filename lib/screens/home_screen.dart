@@ -2,19 +2,72 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:hrm/screens/absensi_screen.dart'; // Import AbsenScreen
-import 'package:hrm/screens/profile_screen.dart'; // Import AbsenScreen
+import 'package:hrm/screens/profile_screen.dart'; // Import ProfileScreen
+import 'package:hrm/screens/izin_screen.dart'; // Import IzinScreen
+import 'package:hrm/screens/rekap_absensi.dart'; // Import RekapAbsensiScreen
+import 'package:hrm/screens/dinas_luar_kota_screen.dart'; // Import DinasLuarScreen
+import 'package:hrm/screens/payroll_screen.dart'; // Import PayrollScreen
+import 'package:hrm/screens/navigation.dart'; // Import CustomBottomNavigationBar
 
-
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 2; // Set default to "Scan Absensi"
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // Update the selected index
+    });
+
+    // Handle navigation logic based on selected index
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => IzinScreen()),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AbsensiScreen()),
+        );
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DinasLuarKotaScreen()), // Added DinasLuarScreen navigation
+        );
+        break;
+      case 4:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ProfileScreen()),
+        );
+        break;
+      default:
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-         ),
-     
+        title: Text('Dashboard'),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -48,13 +101,11 @@ class HomeScreen extends StatelessWidget {
                       _buildLayananItem('Payroll', Icons.attach_money, context),
                       _buildLayananItem('Rekap Absensi', Icons.description, context),
                       _buildLayananItem('Kinerja', Icons.task, context),
-
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-             
               SizedBox(
                 height: 250,
                 child: BarChart(
@@ -87,97 +138,45 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-          bottomLeft: Radius.circular(10),
-          bottomRight: Radius.circular(10),
-        ),
-        child: Material(
-          shadowColor: Colors.grey,
-          elevation: 8,
-          child: BottomNavigationBar(
-            selectedItemColor: Theme.of(context).colorScheme.primary,
-            unselectedItemColor: Colors.grey,
-            showSelectedLabels: true,
-            showUnselectedLabels: true,
-            currentIndex: 2, // Default is set to "Scan Absensi"
-            onTap: (int index) {
-              switch (index) {
-                case 2: // Index for "Scan Absensi"
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AbsensiScreen()),
-                  );
-                  break;
-                case 4: // Index for "My Profile"
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen()),
-                  );
-                  break;
-                default:
-                  // Add other navigation logic here if needed
-                  break;
-              }
-            },
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.history),
-                label: 'Transaksi',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.qr_code_scanner),
-                label: 'Scan Absensi',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.business),
-                label: 'Task',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'My Profile',
-              ),
-            ],
-          ),
-        ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _selectedIndex, // Pass the current index
+        onTap: _onItemTapped, // Handle item tap
       ),
     );
   }
 
-  Widget _buildRequestItem(String title, IconData icon, BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, size: 40, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(height: 8),
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-      ],
+  Widget _buildLayananItem(String title, IconData icon, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (title == 'Absensi') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AbsensiScreen()),
+          );
+        } else if (title == 'Payroll') { // Navigate to PayrollScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PayrollScreen()),
+          );
+        } else if (title == 'Rekap Absensi') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RekapAbsensiScreen()),
+          );
+        } else if (title == 'Dinas Luar Kota') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DinasLuarKotaScreen()), // Navigation to DinasLuarScreen
+          );
+        }
+      },
+      child: Column(
+        children: [
+          Icon(icon, size: 30, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(height: 8),
+          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        ],
+      ),
     );
   }
-
-  Widget _buildLayananItem(String title, IconData icon, BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      if (title == 'Rekap Absensi') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AbsensiScreen()), // Navigasi ke AbsensiScreen
-        );
-      }
-    },
-    child: Column(
-      children: [
-        Icon(icon, size: 30, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(height: 8),
-        Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-      ],
-    ),
-  );
-}
-
-}
+}  
